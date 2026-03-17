@@ -1,5 +1,6 @@
-import React, { useRef } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
+import { animate } from 'animejs';
 import Navbar from './components/Navbar';
 import { AppleCard } from './components/AppleCard';
 import { CircuitWires } from './components/CircuitWires';
@@ -11,6 +12,37 @@ const Portfolio = () => {
     target: containerRef,
     offset: ["start start", "end start"]
   });
+
+  // Anime.js Interactive Animations
+  useEffect(() => {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          animate(entry.target, {
+            y: [50, 0],
+            opacity: [0, 1],
+            ease: 'outCubic',
+            duration: 800,
+          });
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.anime-reveal').forEach((el) => {
+      el.style.opacity = '0';
+      observer.observe(el);
+    });
+
+    animate('.anime-spin-icon', {
+      rotate: 360,
+      duration: 8000,
+      ease: 'linear',
+      loop: true
+    });
+
+    return () => observer.disconnect();
+  }, []);
 
   // Hero Text Animations
   const opacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
@@ -83,7 +115,7 @@ const Portfolio = () => {
             Software Engineering & Systems Architecture
           </motion.span>
 
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tight bg-gradient-to-b from-white via-white to-zinc-400 bg-clip-text text-transparent leading-tight pb-4">
+          <h1 className="text-5xl md:text-7xl font-bold tracking-tight bg-gradient-to-br from-white via-zinc-200 to-zinc-500 bg-clip-text text-transparent leading-tight pb-4">
             Tejas U. Kedarpawar
           </h1>
 
@@ -151,22 +183,25 @@ const Portfolio = () => {
       <div className="relative z-20 bg-black">
         
         {/* SKILLS SECTION */}
-        <section className="px-6 py-32 max-w-6xl mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.8 }}
-          >
+        <section id="skills" className="px-6 py-32 max-w-6xl mx-auto anime-reveal">
+          <motion.div>
             <h2 className="text-sm font-mono text-blue-500 uppercase tracking-widest mb-12">Architecture & Tools</h2>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
               <div className="md:col-span-2 bg-zinc-900/40 backdrop-blur-md p-10 rounded-[2.5rem] border border-white/5">
                 <h4 className="text-2xl font-semibold mb-8 text-white">Full Stack Core</h4>
                 <div className="flex flex-wrap gap-3">
-                  {['React.js', 'PHP', 'MySQL', 'Node.js', 'MongoDB', 'Tailwind CSS', 'Python', 'C++'].map(skill => (
-                    <span key={skill} className="px-5 py-2.5 bg-white/5 rounded-full text-sm font-medium border border-white/10 hover:border-blue-500/50 transition-all cursor-default text-zinc-200">
+                  {['React.js', 'PHP', 'MySQL', 'Node.js', 'MongoDB', 'Tailwind CSS', 'Python', 'C++'].map((skill, index) => (
+                    <motion.span 
+                      key={skill} 
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      whileInView={{ opacity: 1, scale: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.4, delay: index * 0.05 + 0.2 }}
+                      whileHover={{ scale: 1.05, backgroundColor: "rgba(255,255,255,0.1)" }}
+                      className="px-5 py-2.5 bg-white/5 rounded-full text-sm font-medium border border-white/10 hover:border-blue-500/50 transition-all cursor-default text-zinc-200"
+                    >
                       {skill}
-                    </span>
+                    </motion.span>
                   ))}
                 </div>
               </div>
@@ -189,7 +224,7 @@ const Portfolio = () => {
         </section>
 
         {/* PROJECTS SECTION */}
-        <section className="px-6 py-32 max-w-6xl mx-auto">
+        <section id="work" className="px-6 py-32 max-w-6xl mx-auto anime-reveal">
           <h2 className="text-sm font-mono text-blue-500 uppercase tracking-widest mb-12">Live Projects</h2>
           <AppleCard className="bg-zinc-950 border-white/5 p-8 md:p-20 overflow-hidden">
             <div className="grid md:grid-cols-2 gap-16 items-center">
@@ -204,15 +239,16 @@ const Portfolio = () => {
                   for college administrators.
                 </p>
                 <div className="pt-4">
-                  <a 
+                  <motion.a 
                     href="https://stationary.nitpoly.com" 
                     target="_blank" 
-                    rel="noopener noreferrer" 
+                    rel="noopener noreferrer"
+                    whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
-                    className="inline-flex items-center gap-3 bg-white text-black px-10 py-5 rounded-full font-bold hover:bg-zinc-200 transition-all group text-lg shadow-xl shadow-white/5"
+                    className="inline-flex items-center gap-3 bg-white text-black px-10 py-5 rounded-full font-bold transition-all group text-lg shadow-xl shadow-white/5 hover:shadow-blue-500/20"
                   >
-                    View Project <span className="group-hover:translate-x-1 transition-transform">→</span>
-                  </a>
+                    View Project <motion.span animate={{ x: [0, 4, 0] }} transition={{ repeat: Infinity, duration: 1.5 }}>→</motion.span>
+                  </motion.a>
                 </div>
               </div>
               <div className="relative aspect-square md:aspect-video bg-zinc-900/80 rounded-[2rem] border border-white/10 flex flex-col items-center justify-center p-12 overflow-hidden shadow-inner">
@@ -225,12 +261,27 @@ const Portfolio = () => {
               </div>
             </div>
           </AppleCard>
+
+          {/* IN DEVELOPMENT CARD */}
+          <AppleCard className="mt-12 bg-zinc-900/40 border-white/5 p-8 md:p-12 overflow-hidden flex flex-col items-center justify-center text-center">
+             <div className="w-16 h-16 bg-blue-500/10 rounded-full flex items-center justify-center mb-6 border border-blue-500/20">
+               <svg className="w-8 h-8 text-blue-500 anime-spin-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+               </svg>
+             </div>
+             <h4 className="text-2xl md:text-4xl font-bold tracking-tight text-white mb-4">More Projects in Development</h4>
+             <p className="text-zinc-400 text-lg max-w-xl mx-auto">
+               Currently architecting and building new enterprise-grade systems. Stay tuned for advanced full-stack applications and system designs.
+             </p>
+          </AppleCard>
         </section>
 
         {/* EXPERIENCE SECTION */}
-        <section className="px-6 py-32 max-w-6xl mx-auto pb-60">
-          <h2 className="text-sm font-mono text-blue-500 uppercase tracking-widest mb-12">Experience</h2>
-          <AppleCard className="bg-zinc-950 border-white/5 p-10 md:p-16">
+        <section id="experience" className="px-6 py-32 max-w-6xl mx-auto pb-60 anime-reveal">
+          <motion.div>
+            <h2 className="text-sm font-mono text-blue-500 uppercase tracking-widest mb-12">Experience</h2>
+            <AppleCard className="bg-zinc-950 border-white/5 p-10 md:p-16">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-12">
               <div className="flex-1 text-left">
                 <div className="flex items-center gap-6 mb-10">
@@ -259,7 +310,8 @@ const Portfolio = () => {
                 </span>
               </div>
             </div>
-          </AppleCard>
+            </AppleCard>
+          </motion.div>
         </section>
 
         <footer className="py-24 border-t border-white/5 text-center bg-zinc-950/20 backdrop-blur-sm">

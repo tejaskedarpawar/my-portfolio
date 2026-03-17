@@ -29,11 +29,13 @@ const Navbar = () => {
           className="fixed top-6 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-xl"
         >
           <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-full py-4 px-10 flex items-center justify-center shadow-2xl">
-            <div className="flex gap-10 text-sm font-medium text-gray-400">
-              <a href="#" className="hover:text-white transition-colors">Work</a>
-              <a href="#" className="hover:text-white transition-colors">Skills</a>
-              <a href="#" className="hover:text-white transition-colors">Experience</a>
-              <a href="#" className="hover:text-white transition-colors">Contact</a>
+            <div className="flex gap-8 text-sm font-medium text-gray-400">
+              {['Work', 'Skills', 'Experience', 'Contact'].map((item) => (
+                <a key={item} href={`#${item.toLowerCase()}`} className="relative group hover:text-white transition-colors px-2 py-1">
+                  {item}
+                  <span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-blue-500 transition-all duration-300 group-hover:w-full"></span>
+                </a>
+              ))}
             </div>
           </div>
         </motion.nav>
